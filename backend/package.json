@@ -1,0 +1,33 @@
+{
+  "name": "nsc-ai-backend",
+  "version": "1.0.0",
+  "description": "NSC-AI Assistant - AI-Powered Dermatologist Booking Platform",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js"
+  },
+  "keywords": [
+    "healthcare",
+    "AI",
+    "dermatology",
+    "booking"
+  ],
+  "author": "NSC Development Team",
+  "license": "MIT",
+  "dependencies": {
+    "@clerk/express": "^2.0.7",
+    "africastalking": "^0.7.9",
+    "axios": "^1.6.2",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.6",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.6.3",
+    "multer": "^1.4.5-lts.1",
+    "update": "^0.7.4"
+  }
+}
