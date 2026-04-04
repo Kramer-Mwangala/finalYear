@@ -71,20 +71,28 @@ export function AuthModalFrame({
         </div>
       </div>
 
-      {/* Visual column — desktop only, full bleed height */}
-      <div className="relative hidden min-h-0 lg:block lg:border-l lg:border-[#2f4b45]/12">
+      {/* Visual column — desktop only; photo visible through translucent scrims (opaque overlay was hiding the image) */}
+      <div className="relative hidden min-h-0 overflow-hidden lg:block lg:border-l lg:border-[#2f4b45]/12">
         <Image
           src={imageUrl}
           alt={imageAlt}
           fill
-          className="object-cover opacity-50"
-          sizes="55vw"
+          className="z-0 object-cover"
+          sizes="(min-width: 1024px) 50vw, 0px"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#2f4b45] via-[#243d38] to-[#1a2e2a]" />
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#2f4b45] to-transparent opacity-90" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(255,255,255,0.06),transparent_55%),radial-gradient(ellipse_60%_50%_at_100%_100%,rgba(197,108,74,0.1),transparent_50%)]" />
-        <div className="pointer-events-none absolute inset-0 opacity-[0.04] bg-[length:180px_180px] bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(255,255,255,0.5)_2px,rgba(255,255,255,0.5)_3px)]" />
+        <div
+          className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[#1a2e2a]/88 via-[#243d38]/62 to-[#1a2e2a]/78"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_85%_55%_at_50%_0%,rgba(255,255,255,0.12),transparent_58%),radial-gradient(ellipse_55%_45%_at_100%_100%,rgba(90,155,138,0.18),transparent_52%)]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 z-[2] opacity-[0.05] bg-[length:180px_180px] bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(255,255,255,0.55)_2px,rgba(255,255,255,0.55)_3px)]"
+          aria-hidden
+        />
 
         <div className="relative z-10 flex h-full min-h-0 flex-col justify-between gap-8 overflow-y-auto overscroll-contain p-9 xl:p-11">
           <header className="shrink-0 space-y-4">

@@ -223,8 +223,9 @@ export default function Home() {
           src="https://images.unsplash.com/photo-1666214280557-f1b5022eb634?auto=format&fit=crop&w=1800&q=80"
           alt="Clinical care team with patient"
           fill
-          className="pointer-events-none absolute inset-0 z-0 object-cover opacity-[0.08]"
+          className="pointer-events-none absolute inset-0 z-0 object-cover opacity-[0.14]"
           sizes="100vw"
+          priority
         />
         <div className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(165deg,#f4faf9_0%,#e8f2ef_45%,#f0f7f5_100%)]" />
         <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_90%_60%_at_10%_15%,rgba(94,160,145,0.16),transparent_50%),radial-gradient(ellipse_70%_50%_at_90%_30%,rgba(42,69,64,0.1),transparent_55%),radial-gradient(circle_at_50%_100%,rgba(184,149,133,0.08),transparent_45%)]" />
@@ -449,6 +450,7 @@ export default function Home() {
                     alt={`${t.name} testimonial portrait`}
                     width={44}
                     height={44}
+                    sizes="44px"
                     className="h-11 w-11 rounded-md object-cover"
                   />
                   <div>
