@@ -1,228 +1,137 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { AuthModalFrame } from "@/components/ui/auth-modal-frame";
-import { apiUrl } from "@/lib/api";
+import { useState, Suspense } from 'react';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import api, { setAuthToken, ApiError } from '@/lib/api';
+import { Shield } from 'lucide-react';
 
-function formatPhoneDisplay(digits: string) {
-  if (digits.startsWith("254") && digits.length >= 12) {
-    return `+${digits.slice(0, 3)} ${digits.slice(3, 6)} ··· ${digits.slice(-3)}`;
-  }
-  return digits;
-}
-
-export default function VerifyOTPPage() {
+function VerifyOtpForm() {
   const router = useRouter();
-  const [otp, setOtp] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [resendCountdown, setResendCountdown] = useState(0);
-  const [requiresOTP, setRequiresOTP] = useState(false);
+  const searchParams = useSearchParams();
+  const initialPhone = searchParams.get('phone') ?? '';
 
-  useEffect(() => {
-    const pendingPhone = sessionStorage.getItem("pendingPhone");
-    const requiresOTPFlag = sessionStorage.getItem("requiresOTP");
+  const [phoneNumber, setPhoneNumber] = useState(initialPhone);
+  const [otp, setOtp] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
 
-    if (!pendingPhone || requiresOTPFlag !== "true") {
-      router.push("/signup");
-      return;
-    }
-
-    setPhoneNumber(pendingPhone);
-    setRequiresOTP(true);
-  }, [router]);
-
-  useEffect(() => {
-    if (resendCountdown > 0) {
-      const timer = setTimeout(
-        () => setResendCountdown(resendCountdown - 1),
-        1000,
-      );
-      return () => clearTimeout(timer);
-    }
-  }, [resendCountdown]);
-
-  const handleOTPSubmit = async (e: React.FormEvent) => {
+  async function handleVerify(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-
-    if (!otp || otp.length !== 6) {
-      setError("Please enter a valid 6-digit OTP");
-      return;
-    }
-
-    setIsLoading(true);
-
+    setError(null);
+    setInfo(null);
+    setLoading(true);
     try {
-      const response = await fetch(apiUrl("/auth/verify-otp"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phoneNumber, otp }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || "OTP verification failed");
-        return;
-      }
-
-      setSuccess("Verified. Redirecting to your dashboard…");
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      sessionStorage.removeItem("pendingPhone");
-      sessionStorage.removeItem("requiresOTP");
-
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 1500);
-    } catch {
-      setError("An error occurred. Please try again.");
+      const data = (await api.auth.verifyOtp({ phoneNumber, otp })) as {
+        token?: string;
+        user?: { role?: string };
+      };
+      if (data.token) setAuthToken(data.token);
+      const role = data.user?.role ?? 'patient';
+      if (role === 'dermatologist' || role === 'doctor') router.push('/doctor');
+      else if (role === 'admin') router.push('/patient');
+      else router.push('/patient');
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Verification failed');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  };
+  }
 
-  const handleResendOTP = async () => {
-    setError("");
-    setSuccess("");
-    setIsLoading(true);
-
+  async function handleResend() {
+    setError(null);
+    setInfo(null);
+    setResending(true);
     try {
-      const response = await fetch(apiUrl("/auth/resend-otp"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phoneNumber }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || "Resend failed");
-        return;
-      }
-
-      setSuccess("A new code was sent to your phone.");
-      setResendCountdown(60);
-    } catch {
-      setError("Failed to resend OTP. Please try again.");
+      await api.auth.resendOtp({ phoneNumber });
+      setInfo('A new code was sent if this number is registered and not yet verified.');
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not resend code');
     } finally {
-      setIsLoading(false);
+      setResending(false);
     }
-  };
-
-  if (!requiresOTP) {
-    return (
-      <div className="flex h-full min-h-0 flex-1 items-center justify-center">
-        <div
-          className="h-10 w-10 animate-pulse rounded-full bg-[#dce8ef] ring-4 ring-[#dce8ef]/5"
-          aria-hidden
-        />
-      </div>
-    );
   }
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-1 flex-col">
-      <AuthModalFrame
-        eyebrow="Identity check"
-        title="Confirm your mobile number"
-        subtitle={`Enter the 6-digit code we sent to ${formatPhoneDisplay(phoneNumber)}. This matches hospital SMS reminders for appointments.`}
-        imageUrl="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1400&q=80"
-        imageAlt="Clinical care environment"
-        highlights={[
-          "Codes expire in minutes—request a new one if needed",
-          "Never share your code with anyone calling you unexpectedly",
-          "After verification you can sign in with email and password",
-        ]}
-        supportText="Front desk & appointments: 0721-497-444 during clinic hours."
-      >
-        {error ? (
-          <div
-            className="mb-5 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-900"
-            role="alert"
-          >
-            {error}
+    <div className="min-h-screen flex items-center justify-center p-6 bg-background">
+      <div className="w-full max-w-md border border-border rounded-xl p-8 bg-card shadow-sm">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+            <Shield className="w-5 h-5 text-primary" />
           </div>
-        ) : null}
-
-        {success ? (
-          <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-sm text-emerald-900">
-            {success}
-          </div>
-        ) : null}
-
-        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-[#4a7c6f]">
-          SMS verification
-        </p>
-        <h2 className="mt-2 font-display text-3xl font-semibold text-[#142c38] sm:text-4xl">
-          One-time code
-        </h2>
-
-        <form onSubmit={handleOTPSubmit} className="mt-6 space-y-5">
           <div>
-            <label
-              htmlFor="otp-input"
-              className="mb-1.5 block text-xs font-bold uppercase tracking-[0.12em] text-[#1e4556]"
-            >
-              6-digit code
-            </label>
-            <input
-              id="otp-input"
+            <h1 className="text-xl font-bold text-foreground">Verify your phone</h1>
+            <p className="text-sm text-muted-foreground">Enter the code we sent by SMS</p>
+          </div>
+        </div>
+
+        <form onSubmit={handleVerify} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">Phone number</label>
+            <Input
+              type="tel"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder="+254712345678 or 0712345678"
+              className="w-full bg-input border-border rounded-lg"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">6-digit code</label>
+            <Input
               type="text"
               inputMode="numeric"
               autoComplete="one-time-code"
               value={otp}
-              onChange={(e) =>
-                setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
-              }
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              placeholder="000000"
+              className="w-full bg-input border-border rounded-lg tracking-widest text-lg font-mono"
               maxLength={6}
-              placeholder="• • • • • •"
-              className="w-full rounded-xl border border-[#c5d4de] bg-[#fcfbfa] px-4 py-4 text-center font-mono text-2xl tracking-[0.45em] text-[#142c38] outline-none focus:border-[#4a7c6f] focus:ring-2 focus:ring-[#4a7c6f]/20"
+              required
             />
-            <p className="mt-2 text-xs text-[#5a7a8a]">
-              From the SMS titled verification or Nairobi Skin Centre.
-            </p>
           </div>
 
-          <button
-            type="submit"
-            disabled={isLoading || otp.length !== 6}
-            className="w-full rounded-xl bg-[linear-gradient(165deg,#4a7c6f_0%,#3a6358_100%)] px-5 py-3.5 text-sm font-bold uppercase tracking-[0.12em] text-white shadow-lg shadow-[#2d4f45]/22 transition hover:brightness-[1.03] disabled:opacity-50"
-          >
-            {isLoading ? "Verifying…" : "Verify & continue"}
-          </button>
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          {info && <p className="text-sm text-muted-foreground">{info}</p>}
+
+          <Button type="submit" className="w-full" disabled={loading || otp.length < 6}>
+            {loading ? 'Verifying…' : 'Verify & continue'}
+          </Button>
         </form>
 
-        <div className="mt-6 border-t border-[#dce8ef] pt-6 text-center">
-          <p className="text-sm text-[#3d5a66]">Did not receive a code?</p>
+        <div className="mt-6 flex flex-col gap-3 text-center text-sm">
           <button
             type="button"
-            onClick={handleResendOTP}
-            disabled={resendCountdown > 0 || isLoading}
-            className="mt-2 text-sm font-semibold text-[#1e4556] underline-offset-2 hover:text-[#4a7c6f] hover:underline disabled:text-[#8aa0ad] disabled:no-underline"
+            onClick={handleResend}
+            disabled={resending || !phoneNumber.trim()}
+            className="text-primary font-medium hover:underline disabled:opacity-50"
           >
-            {resendCountdown > 0
-              ? `Resend in ${resendCountdown}s`
-              : "Resend SMS code"}
+            {resending ? 'Sending…' : 'Resend code'}
           </button>
-
-          <p className="mt-4 text-xs text-[#5a7a8a]">
-            Wrong number?{" "}
-            <Link
-              href="/signup"
-              className="font-semibold text-[#1e4556] hover:text-[#4a7c6f] hover:underline"
-            >
-              Start registration again
-            </Link>
-          </p>
+          <Link href="/sign-in" className="text-muted-foreground hover:text-foreground">
+            Back to sign in
+          </Link>
         </div>
-      </AuthModalFrame>
+      </div>
     </div>
+  );
+}
+
+export default function VerifyOtpPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-background text-muted-foreground">
+          Loading…
+        </div>
+      }
+    >
+      <VerifyOtpForm />
+    </Suspense>
   );
 }

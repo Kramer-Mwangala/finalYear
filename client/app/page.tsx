@@ -1,629 +1,727 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import Image from "next/image";
-import type { ReactNode } from "react";
-import { useState } from "react";
-import { glassCard, motionFadeUp, staggerContainer } from "@/lib/tailwind-patterns";
+import { useState } from 'react';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { ChevronDown, Menu, X } from 'lucide-react';
 
-function HeroIllustration() {
+/** Stock photos (Unsplash) — replace with your own clinic photography anytime. */
+const IMG = {
+  heroClinic:
+    'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=2000&q=80',
+  consultation:
+    'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1600&q=80',
+  medicalTeam:
+    'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1600&q=80',
+  dermatologyExam:
+    'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?auto=format&fit=crop&w=1600&q=80',
+  skinCare:
+    'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?auto=format&fit=crop&w=1200&q=80',
+  laserAesthetic:
+    'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=1200&q=80',
+  reception:
+    'https://images.unsplash.com/photo-1551190822-a9333d879b1f?auto=format&fit=crop&w=1600&q=80',
+  wellness:
+    'https://images.unsplash.com/photo-1570172619647-dfcb95609052?auto=format&fit=crop&w=1200&q=80',
+} as const;
+
+const SERVICES = [
+  {
+    title: 'Acne Treatment',
+    desc: 'Advanced treatments for acne and acne scars including laser therapy and chemical peels.',
+    image: IMG.skinCare,
+  },
+  {
+    title: 'Anti-Aging',
+    desc: 'Combat signs of aging with dermal fillers, botox, and advanced skincare protocols.',
+    image: IMG.wellness,
+  },
+  {
+    title: 'Pigmentation',
+    desc: 'Treat hyperpigmentation, melasma, and uneven skin tone with specialized therapies.',
+    image: IMG.laserAesthetic,
+  },
+  {
+    title: 'Hair Loss Treatment',
+    desc: 'Comprehensive solutions for hair loss including PRP therapy and medication.',
+    image: IMG.dermatologyExam,
+  },
+  {
+    title: 'Laser Treatments',
+    desc: 'State-of-the-art laser technology for skin rejuvenation and hair removal.',
+    image: IMG.laserAesthetic,
+  },
+  {
+    title: 'Eczema & Dermatitis',
+    desc: 'Specialized care for sensitive skin conditions and dermatological diseases.',
+    image: IMG.consultation,
+  },
+] as const;
+
+const sectionShell = 'px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20';
+const contentMax = 'max-w-screen-2xl mx-auto w-full';
+
+export default function LandingPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
-    <svg
-      aria-hidden="true"
-      className="h-full w-full"
-      viewBox="0 0 420 420"
-      fill="none"
-    >
-      <defs>
-        <linearGradient id="nscStroke" x1="86" y1="60" x2="350" y2="360" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#7eb8a8" />
-          <stop offset="0.45" stopColor="#2a4540" />
-          <stop offset="1" stopColor="#b89585" />
-        </linearGradient>
-        <filter
-          id="nscGlow"
-          x="-50%"
-          y="-50%"
-          width="200%"
-          height="200%"
-          filterUnits="userSpaceOnUse"
+    <div className="w-full bg-white">
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-md border-b border-border z-50">
+        <div
+          className={`${contentMax} ${sectionShell} h-16 flex items-center justify-between gap-4`}
         >
-          <feGaussianBlur stdDeviation="8" result="blur" />
-          <feColorMatrix
-            in="blur"
-            type="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.6 0"
-          />
-          <feMerge>
-            <feMergeNode />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
+          <div className="text-xl font-bold text-primary">NSC</div>
 
-      {/* Soft floating orbs */}
-      <circle cx="320" cy="138" r="18" fill="#5a9b8a" opacity="0.2" />
-      <circle cx="120" cy="260" r="22" fill="#2a4540" opacity="0.16" />
-      <circle
-        cx="284"
-        cy="250"
-        r="9"
-        fill="#7eb8a8"
-        className="motion-safe:animate-pulse-soft motion-reduce:animate-none"
-        style={{ transformOrigin: "center", transformBox: "fill-box" }}
-      />
-      <circle
-        cx="158"
-        cy="158"
-        r="7"
-        fill="#2a4540"
-        className="motion-safe:animate-pulse-soft motion-reduce:animate-none"
-        style={{ transformOrigin: "center", transformBox: "fill-box" }}
-      />
+          <div className="hidden md:flex items-center gap-8">
+            <a href="#services" className="text-foreground hover:text-primary transition-colors">
+              Services
+            </a>
+            <a href="#testimonials" className="text-foreground hover:text-primary transition-colors">
+              Testimonials
+            </a>
+            <a href="#faq" className="text-foreground hover:text-primary transition-colors">
+              FAQ
+            </a>
+            <a href="#contact" className="text-foreground hover:text-primary transition-colors">
+              Contact
+            </a>
+          </div>
 
-      {/* Main “skin triage” contour */}
-      <path
-        className="motion-safe:animate-draw-path motion-reduce:[stroke-dashoffset:0]"
-        style={{ strokeDasharray: 520, strokeDashoffset: 520 }}
-        d="M120 215c26-70 80-110 133-110 44 0 73 24 83 54 10 30 5 65-18 96-21 29-52 43-84 57-45 20-74 45-87 75-10 22-48 16-56-9-6-20 2-44 7-63 7-28 15-55 22-99Z"
-        stroke="url(#nscStroke)"
-        strokeWidth="5"
-        strokeLinecap="round"
-        filter="url(#nscGlow)"
-      />
+          <div className="hidden md:flex items-center gap-4">
+            <Link href="/sign-in">
+              <Button variant="ghost">Sign In</Button>
+            </Link>
+            <Link href="/sign-up">
+              <Button>Get Started</Button>
+            </Link>
+          </div>
 
-      {/* Tech lines */}
-      <path
-        d="M90 290c35-22 74-33 118-30 46 3 92 20 132 48"
-        stroke="rgba(90,155,138,0.55)"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeDasharray="10 10"
-      />
-      <path
-        d="M105 140c28 12 56 17 86 14 36-3 70-16 102-39"
-        stroke="rgba(42,69,64,0.45)"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeDasharray="10 10"
-      />
-    </svg>
-  );
-}
+          <button
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
 
-function StarIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className ?? "h-4 w-4"}
-    >
-      <path
-        d="M12 2.5l3.1 6.7 7.3 1.1-5.3 5.2 1.3 7.2-6.4-3.4-6.4 3.4 1.3-7.2-5.3-5.2 7.3-1.1L12 2.5z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-border bg-white p-4 flex flex-col gap-4">
+            <a href="#services" className="text-foreground hover:text-primary">
+              Services
+            </a>
+            <a href="#testimonials" className="text-foreground hover:text-primary">
+              Testimonials
+            </a>
+            <a href="#faq" className="text-foreground hover:text-primary">
+              FAQ
+            </a>
+            <a href="#contact" className="text-foreground hover:text-primary">
+              Contact
+            </a>
+            <Link href="/sign-in">
+              <Button variant="ghost" className="w-full justify-center">
+                Sign In
+              </Button>
+            </Link>
+            <Link href="/sign-up">
+              <Button className="w-full">Get Started</Button>
+            </Link>
+          </div>
+        )}
+      </nav>
 
-export default function Home() {
-  const [isLoggedIn] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
-    return !!localStorage.getItem("token");
-  });
-
-  const serviceHighlights: Array<{
-    title: string;
-    description: string;
-    icon: ReactNode;
-  }> = [
-    {
-      title: "AI Skin Triage",
-      description:
-        "Upload skin images for guided, structured pre-consult analysis before clinical review.",
-      icon: (
-        <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6">
-          <path
-            d="M9.5 4.5c-2.2 1-3.8 3.2-3.8 5.7 0 2.3 1.3 4.3 3.2 5.4.4.2.6.7.5 1.1l-.5 2.4 2-1.1c.3-.2.7-.2 1 0l2 1.1-.5-2.4c-.1-.4.1-.9.5-1.1 1.9-1.1 3.2-3.1 3.2-5.4 0-2.5-1.6-4.7-3.8-5.7"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M10 9.5h4M10 12h4"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
-      ),
-    },
-    {
-      title: "Specialist Bookings",
-      description:
-        "Schedule consultations with dermatology professionals and track every appointment in one place.",
-      icon: (
-        <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6">
-          <path
-            d="M7 7h10v4a5 5 0 0 1-10 0V7Z"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M9 7V5.8c0-1.2 1-2.3 3-2.3s3 1.1 3 2.3V7"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          <path
-            d="M12 11v4M10 13h4"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
-      ),
-    },
-    {
-      title: "Pharmacy Follow-up",
-      description:
-        "Manage prescriptions and treatment continuity with connected medication workflows.",
-      icon: (
-        <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6">
-          <path
-            d="M12 3v18"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          <path
-            d="M7 7h6.5a3.5 3.5 0 0 1 0 7H7V7Z"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M18 13l2 2"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
-      ),
-    },
-  ];
-
-  const processSteps = [
-    {
-      title: "Create Your Secure Profile",
-      text: "Sign up once and keep your dermatology records, images, and consultations organized.",
-    },
-    {
-      title: "Upload And Get AI Guidance",
-      text: "Use image upload with intelligent triage to speed up your clinical pathway.",
-    },
-    {
-      title: "Consult, Treat, Track",
-      text: "Book, pay, and review your progress from dashboard to pharmacy follow-up.",
-    },
-  ];
-
-  return (
-    <div className="overflow-x-hidden text-[#1c2c2a]">
+      {/* Hero Section */}
       <section
-        className={`relative isolate min-h-[min(100dvh,58rem)] overflow-hidden ${motionFadeUp}`}
+        className={`pt-28 sm:pt-32 pb-16 sm:pb-24 ${sectionShell} bg-gradient-to-b from-secondary via-background to-background overflow-hidden relative`}
       >
-        <Image
-          src="https://images.unsplash.com/photo-1666214280557-f1b5022eb634?auto=format&fit=crop&w=1800&q=80"
-          alt="Clinical care team with patient"
-          fill
-          className="pointer-events-none absolute inset-0 z-0 object-cover opacity-[0.14]"
-          sizes="100vw"
-          priority
-        />
-        <div className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(165deg,#f4faf9_0%,#e8f2ef_45%,#f0f7f5_100%)]" />
-        <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_90%_60%_at_10%_15%,rgba(94,160,145,0.16),transparent_50%),radial-gradient(ellipse_70%_50%_at_90%_30%,rgba(42,69,64,0.1),transparent_55%),radial-gradient(circle_at_50%_100%,rgba(184,149,133,0.08),transparent_45%)]" />
-        <div className="pointer-events-none absolute -right-20 top-0 h-72 w-72 rounded-full bg-[#5a9b8a]/14 blur-3xl sm:right-0 sm:h-80 sm:w-80" />
-        <div className="pointer-events-none absolute -bottom-24 -left-20 h-80 w-80 rounded-full bg-[#2a4540]/10 blur-3xl" />
+        <div className="absolute inset-0 opacity-30 pointer-events-none">
+          <div className="absolute top-20 right-1/4 w-96 h-96 bg-primary rounded-full blur-3xl animate-pulse-soft" />
+          <div
+            className="absolute -bottom-20 left-1/4 w-[28rem] h-[28rem] bg-accent rounded-full blur-3xl animate-pulse-soft"
+            style={{ animationDelay: '2s' }}
+          />
+        </div>
 
-        <div className="relative z-10 mx-auto max-w-7xl px-4 pb-20 pt-[12.25rem] sm:px-6 sm:pb-24 sm:pt-[13rem] lg:px-8 lg:pb-28 lg:pt-[14rem]">
-          <div className="grid gap-12 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:gap-14">
-            <div className="max-w-2xl space-y-7 lg:max-w-none">
-              <div className="inline-flex items-center gap-2 rounded-sm border border-[#2a4540]/18 bg-white/80 px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#356b5f] shadow-sm backdrop-blur-sm sm:text-xs">
-                <span
-                  className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#5a9b8a]"
-                  aria-hidden
+        <div className={`${contentMax} relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center`}>
+          <div className="lg:col-span-6 text-center lg:text-left">
+            <div className="inline-block mb-4 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+              <p className="text-sm font-medium text-primary">Welcome to Premier Dermatology</p>
+            </div>
+
+            <h1 className="text-4xl sm:text-5xl xl:text-6xl font-bold text-foreground mb-6 text-balance leading-tight animate-slide-up">
+              Expert Dermatology with AI-Powered Insights
+            </h1>
+            <p
+              className="text-lg sm:text-xl text-muted-foreground mb-8 text-balance max-w-2xl mx-auto lg:mx-0 lg:max-w-none animate-slide-up"
+              style={{ animationDelay: '0.1s' }}
+            >
+              Nairobi Skin Centre combines cutting-edge technology with expert medical care to deliver
+              personalized skincare solutions tailored to your unique needs.
+            </p>
+            <div
+              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-slide-up"
+              style={{ animationDelay: '0.2s' }}
+            >
+              <Link href="/sign-up">
+                <Button size="lg" className="w-full sm:w-auto bg-primary hover:bg-primary/90 px-8">
+                  Start Your Journey
+                </Button>
+              </Link>
+              <Link href="#contact">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto border-border hover:bg-secondary/50 px-8">
+                  Book Consultation
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          <div className="lg:col-span-6 relative animate-slide-right" style={{ animationDelay: '0.15s' }}>
+            <div className="relative aspect-[4/3] w-full max-w-2xl mx-auto lg:max-w-none rounded-2xl overflow-hidden shadow-2xl border border-border/60 ring-1 ring-black/5">
+              <Image
+                src={IMG.heroClinic}
+                alt="Bright, modern hospital clinic corridor"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 via-transparent to-transparent pointer-events-none" />
+              <p className="absolute bottom-4 left-4 right-4 text-white text-sm font-medium drop-shadow-md">
+                A calm, clinical environment focused on skin health
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section id="services" className={`py-20 sm:py-28 ${sectionShell} bg-background`}>
+        <div className={contentMax}>
+          <div className="text-center mb-14 sm:mb-20 max-w-3xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl xl:text-5xl font-bold text-foreground mb-4 animate-slide-up">
+              Our Services
+            </h2>
+            <p className="text-lg sm:text-xl text-muted-foreground animate-slide-up" style={{ animationDelay: '0.1s' }}>
+              Comprehensive dermatological care for all your skin concerns
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+            {SERVICES.map((service, idx) => (
+              <div
+                key={service.title}
+                className="group border border-border bg-card hover:border-primary/30 hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden flex flex-col animate-slide-up"
+                style={{ animationDelay: `${0.05 * idx}s` }}
+              >
+                <div className="relative aspect-[16/10] w-full overflow-hidden">
+                  <Image
+                    src={service.image}
+                    alt={`${service.title} — dermatology care at Nairobi Skin Centre`}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                  <h3 className="absolute bottom-4 left-4 right-4 text-xl font-semibold text-white drop-shadow-sm">
+                    {service.title}
+                  </h3>
+                </div>
+                <div className="p-6 flex-1 flex flex-col">
+                  <p className="text-muted-foreground group-hover:text-foreground transition-colors leading-relaxed">
+                    {service.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* AI Analysis Feature */}
+      <section className={`py-20 sm:py-28 ${sectionShell} bg-secondary/30 overflow-hidden relative`}>
+        <div className="absolute inset-0 opacity-25 pointer-events-none">
+          <div
+            className="absolute top-1/2 right-0 w-[28rem] h-[28rem] bg-primary rounded-full blur-3xl animate-pulse-soft"
+            style={{ animationDelay: '1s' }}
+          />
+        </div>
+
+        <div className={`${contentMax} relative z-10`}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-20 items-center">
+            <div className="animate-slide-left max-w-xl lg:max-w-none">
+              <h2 className="text-3xl sm:text-4xl xl:text-5xl font-bold text-foreground mb-6 text-balance">
+                AI-Powered Skin Analysis
+              </h2>
+              <p className="text-lg sm:text-xl text-muted-foreground mb-8 leading-relaxed">
+                Our advanced AI technology analyzes your skin with precision, identifying concerns and
+                recommending personalized treatment plans reviewed by our expert dermatologists.
+              </p>
+              <ul className="space-y-4 mb-10">
+                {[
+                  'Instant skin analysis in minutes',
+                  'Personalized treatment recommendations',
+                  'Doctor-reviewed results',
+                  'Progress tracking over time',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 group">
+                    <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-primary transition-colors" />
+                    <span className="text-foreground group-hover:text-primary transition-colors text-base">
+                      {item}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/sign-up">
+                <Button size="lg" className="bg-primary hover:bg-primary/90 px-8">
+                  Try AI Analysis Today
+                </Button>
+              </Link>
+            </div>
+
+            <div className="relative animate-slide-right" style={{ animationDelay: '0.2s' }}>
+              <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-2xl border border-border/60 ring-1 ring-black/5">
+                <Image
+                  src={IMG.medicalTeam}
+                  alt="Clinical team in a hospital setting"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                 />
-                Dermatology · Digital care · Nairobi
-              </div>
-
-              <div className="space-y-4">
-                <h1 className="font-display text-[2.15rem] font-semibold leading-[1.1] tracking-tight text-[#14221f] sm:text-5xl sm:leading-tight lg:text-6xl xl:text-7xl">
-                  Specialist skin care,
-                  <span className="mt-2 block bg-gradient-to-r from-[#2a4540] via-[#356b5f] to-[#2a4540] bg-clip-text text-transparent lg:mt-0">
-                    supported by thoughtful technology.
-                  </span>
-                </h1>
-                <p className="max-w-xl text-[15px] leading-relaxed text-[#4a5c59] sm:text-base sm:leading-relaxed lg:text-lg">
-                  Hospital-aligned workflows for Nairobi Skin Centre: secure
-                  triage, dermatology bookings, and continuity from first
-                  concern through treatment—without replacing your clinician.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-3">
-                {!isLoggedIn ? (
-                  <>
-                    <Link
-                      href="/signup"
-                      className="rounded-sm bg-[#2a4540] px-7 py-3.5 text-sm font-bold uppercase tracking-[0.1em] text-white shadow-md shadow-[#1a2e2a]/20 transition hover:bg-[#1f3330]"
-                    >
-                      Start your journey
-                    </Link>
-                    <Link
-                      href="/login"
-                      className="rounded-sm border border-[#2a4540]/35 bg-white/90 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.1em] text-[#2a4540] shadow-sm backdrop-blur-sm transition hover:border-[#2a4540]/55 hover:bg-white"
-                    >
-                      Sign in
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      href="/bookings/new"
-                      className="rounded-sm bg-[#2a4540] px-7 py-3.5 text-sm font-bold uppercase tracking-[0.1em] text-white shadow-md shadow-[#1a2e2a]/20 transition hover:bg-[#1f3330]"
-                    >
-                      Book consultation
-                    </Link>
-                    <Link
-                      href="/dashboard"
-                      className="rounded-sm border border-[#2a4540]/35 bg-white/90 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.1em] text-[#2a4540] shadow-sm backdrop-blur-sm transition hover:border-[#2a4540]/55 hover:bg-white"
-                    >
-                      Open dashboard
-                    </Link>
-                  </>
-                )}
-              </div>
-
-              <div className={`grid gap-3 sm:grid-cols-3 sm:gap-4 ${staggerContainer}`}>
-                <div className="rounded-sm border border-[#2a4540]/12 bg-white/90 p-4 shadow-sm backdrop-blur-sm">
-                  <p className="text-xl font-extrabold text-[#2a4540] sm:text-2xl">
-                    8am–5pm
-                  </p>
-                  <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5a6e6a]">
-                    Mon–Fri clinical hours
-                  </p>
-                </div>
-                <div className="rounded-sm border border-[#2a4540]/12 bg-white/90 p-4 shadow-sm backdrop-blur-sm">
-                  <p className="text-xl font-extrabold text-[#2a4540] sm:text-2xl">
-                    Two lines
-                  </p>
-                  <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5a6e6a]">
-                    0721 / 0780-497-444
-                  </p>
-                </div>
-                <div className="rounded-sm border border-[#2a4540]/12 bg-white/90 p-4 shadow-sm backdrop-blur-sm sm:col-span-1">
-                  <p className="text-xl font-extrabold text-[#2a4540] sm:text-2xl">
-                    One platform
-                  </p>
-                  <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5a6e6a]">
-                    Triage · bookings · pharmacy
-                  </p>
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 via-transparent to-accent/20 pointer-events-none" />
+                <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 bg-gradient-to-t from-foreground/80 to-transparent">
+                  <p className="text-lg font-semibold text-white">Advanced clinical workflows</p>
+                  <p className="text-white/90 text-sm mt-1">AI-assisted documentation and dermatology pathways</p>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
 
-            <div className="relative mx-auto w-full max-w-lg lg:mx-0 lg:max-w-none">
-              <div className="relative aspect-[5/4] w-full sm:aspect-[4/3] lg:aspect-auto lg:min-h-[min(420px,50vh)]">
-                <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden opacity-[0.95] sm:-inset-3 lg:-inset-4">
-                  <HeroIllustration />
+      {/* Dashboard Preview Section */}
+      <section
+        className={`py-20 sm:py-28 ${sectionShell} bg-gradient-to-b from-secondary/50 to-background overflow-hidden relative`}
+      >
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary rounded-full blur-3xl animate-pulse-soft" />
+        </div>
+
+        <div className={`${contentMax} relative z-10`}>
+          <div className="text-center mb-14 sm:mb-20 max-w-3xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl xl:text-5xl font-bold text-foreground mb-4 animate-slide-up">
+              Your Dashboard at a Glance
+            </h2>
+            <p className="text-lg sm:text-xl text-muted-foreground animate-slide-up" style={{ animationDelay: '0.1s' }}>
+              Access comprehensive tools designed for your dermatological care journey
+            </p>
+            <div className="flex flex-wrap justify-center gap-3 mt-8 animate-slide-up" style={{ animationDelay: '0.15s' }}>
+              <Link href="/patient">
+                <Button size="lg">View patient dashboard</Button>
+              </Link>
+              <Link href="/doctor">
+                <Button size="lg" variant="outline">
+                  View doctor dashboard
+                </Button>
+              </Link>
+            </div>
+            <p className="text-sm text-muted-foreground mt-4 max-w-2xl mx-auto leading-relaxed">
+              Demo layouts only — no sign-in required. API calls use <span className="font-mono text-xs">NEXT_PUBLIC_API_URL</span> and{' '}
+              <span className="font-mono text-xs">lib/api.ts</span>.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 mb-12 lg:mb-16">
+            {/* Patient Dashboard Features */}
+            <div className="border border-border rounded-xl overflow-hidden bg-card hover:shadow-xl transition-all duration-300 animate-slide-left flex flex-col">
+              <div className="relative h-44 sm:h-52 w-full">
+                <Image
+                  src={IMG.consultation}
+                  alt="Patient consultation at a dermatology clinic"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-card from-10% to-transparent" />
+              </div>
+              <div className="p-8 pt-4 flex-1">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
+                  <div className="w-6 h-6 bg-primary rounded"></div>
                 </div>
-                <div className="relative z-[1] flex h-full min-h-[280px] items-stretch sm:min-h-[300px] lg:min-h-0">
-                  <div
-                    className={`flex w-full flex-col justify-center rounded-sm border border-[#2a4540]/12 p-6 shadow-[0_20px_50px_-24px_rgba(26,46,42,0.25)] sm:p-7 ${glassCard}`}
-                  >
-                    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#356b5f]">
-                      Clinical snapshot
-                    </p>
-                    <h2 className="mt-2 font-display text-3xl font-semibold leading-tight text-[#2a4540] sm:text-4xl">
-                      Patient-first,
-                      <span className="block text-[#4d7c70]">
-                        dermatologist-led
-                      </span>
-                    </h2>
-                    <div className="mt-5 space-y-2.5">
-                      {[
-                        "Structured intake before your dermatology consultation",
-                        "Appointments, records, and billing in one secure place",
-                        "Pharmacy and follow-up aligned with hospital practice",
-                      ].map((item) => (
-                        <div
-                          key={item}
-                          className="flex items-start gap-3 rounded-sm border border-[#2a4540]/10 bg-white/85 p-3"
-                        >
-                          <span className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-[#5a9b8a]" />
-                          <p className="text-sm leading-snug text-[#4a5c59]">
-                            {item}
-                          </p>
-                        </div>
-                      ))}
+                <h3 className="text-2xl font-bold text-foreground">Patient Dashboard</h3>
+              </div>
+              <div className="space-y-4">
+                <div className="flex gap-4">
+                  <div className="w-1 bg-primary rounded-full flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1">Medical Profile</h4>
+                    <p className="text-sm text-muted-foreground">Complete medical history, allergies, and health records in one secure location</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-1 bg-primary rounded-full flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1">AI Skin Analysis</h4>
+                    <p className="text-sm text-muted-foreground">Get detailed skin analysis with AI-powered insights and personalized treatment recommendations</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-1 bg-primary rounded-full flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1">Appointment Booking</h4>
+                    <p className="text-sm text-muted-foreground">Book consultations with our expert dermatologists with real-time availability</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-1 bg-primary rounded-full flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1">Prescription Management</h4>
+                    <p className="text-sm text-muted-foreground">Track prescriptions, refills, and recommended pharmacy products</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-1 bg-primary rounded-full flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1">Lab Management</h4>
+                    <p className="text-sm text-muted-foreground">Order diagnostic tests and view results with voice assistant support</p>
+                  </div>
+                </div>
+              </div>
+              </div>
+            </div>
+
+            {/* Doctor Dashboard Features */}
+            <div
+              className="border border-border rounded-xl overflow-hidden bg-card hover:shadow-xl transition-all duration-300 animate-slide-right flex flex-col"
+              style={{ animationDelay: '0.1s' }}
+            >
+              <div className="relative h-44 sm:h-52 w-full">
+                <Image
+                  src={IMG.dermatologyExam}
+                  alt="Dermatologist examining a patient"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-card from-10% to-transparent" />
+              </div>
+              <div className="p-8 pt-4 flex-1">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-accent/20 rounded-lg flex items-center justify-center">
+                  <div className="w-6 h-6 bg-accent rounded"></div>
+                </div>
+                <h3 className="text-2xl font-bold text-foreground">Doctor Dashboard</h3>
+              </div>
+              <div className="space-y-4">
+                <div className="flex gap-4">
+                  <div className="w-1 bg-accent rounded-full flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1">Patient Queue Management</h4>
+                    <p className="text-sm text-muted-foreground">View prioritized patient queue with AI skin analysis scores and status</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-1 bg-accent rounded-full flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1">Patient Records</h4>
+                    <p className="text-sm text-muted-foreground">Access complete patient history and diagnosis templates for efficient consultation</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-1 bg-accent rounded-full flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1">Appointment Schedule</h4>
+                    <p className="text-sm text-muted-foreground">View daily appointments with detailed patient information and notes</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-1 bg-accent rounded-full flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1">Analytics & Insights</h4>
+                    <p className="text-sm text-muted-foreground">Track treatment outcomes, trends, and performance metrics</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-1 bg-accent rounded-full flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1">Diagnosis Tools</h4>
+                    <p className="text-sm text-muted-foreground">Access AI-assisted diagnosis and personalized treatment planning</p>
+                  </div>
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Key Benefits */}
+          <div className="relative rounded-2xl border border-border overflow-hidden animate-slide-up">
+            <div className="absolute inset-0">
+              <Image
+                src={IMG.reception}
+                alt="Welcoming clinic reception"
+                fill
+                className="object-cover opacity-20"
+                sizes="100vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/90" />
+            </div>
+            <div className="relative p-8 sm:p-12 lg:p-14">
+            <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-8 sm:mb-10 text-center">
+              Why Choose NSC&apos;s Platform
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-primary mb-2">5000+</div>
+                <p className="text-muted-foreground">Active patients trust our platform for their skincare needs</p>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-primary mb-2">50+</div>
+                <p className="text-muted-foreground">Expert dermatologists providing comprehensive care</p>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-primary mb-2">24/7</div>
+                <p className="text-muted-foreground">Access your health data anytime, anywhere, with top-tier security</p>
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section id="testimonials" className={`py-20 sm:py-28 ${sectionShell} bg-background`}>
+        <div className={contentMax}>
+          <div className="text-center mb-14 sm:mb-20 max-w-3xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl xl:text-5xl font-bold text-foreground mb-4 animate-slide-up">
+              What Patients Say
+            </h2>
+            <p className="text-lg sm:text-xl text-muted-foreground animate-slide-up" style={{ animationDelay: '0.1s' }}>
+              Real results from real patients at Nairobi Skin Centre
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+            {[
+              {
+                name: 'Sarah Kipchoge',
+                text: 'The AI skin analysis was incredibly accurate. The treatment plan was tailored perfectly to my needs. Highly recommended!',
+                initials: 'SK',
+                rating: 5,
+              },
+              {
+                name: 'James Mwangi',
+                text: 'Professional staff, state-of-the-art equipment, and results that exceed expectations. Best dermatology clinic in Nairobi.',
+                initials: 'JM',
+                rating: 5,
+              },
+              {
+                name: 'Grace Okonkwo',
+                text: 'The combination of technology and expert doctors made my treatment journey smooth and effective.',
+                initials: 'GO',
+                rating: 5,
+              },
+            ].map((testimonial, idx) => (
+              <div
+                key={idx}
+                className="border border-border p-8 bg-card rounded-xl hover:shadow-xl hover:border-primary/30 transition-all duration-300 group animate-slide-up h-full flex flex-col"
+                style={{ animationDelay: `${0.1 * idx}s` }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent text-white flex items-center justify-center font-semibold text-sm group-hover:scale-110 transition-transform">
+                      {testimonial.initials}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground">{testimonial.name}</h4>
+                      <p className="text-sm text-muted-foreground">Patient</p>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="services"
-        className={`scroll-mt-28 bg-[#f4faf9] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24 ${motionFadeUp}`}
-      >
-        <div className="mx-auto max-w-7xl">
-          <div className="mx-auto mb-12 max-w-3xl text-center lg:mb-14">
-            <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#356b5f] sm:text-xs">
-              Core services
-            </p>
-            <h2 className="mt-3 font-display text-3xl font-semibold leading-tight text-[#23342f] sm:text-4xl lg:text-[2.65rem]">
-              Designed around real care journeys
-            </h2>
-          </div>
-
-          <div className={`grid gap-5 sm:gap-6 md:grid-cols-3 ${staggerContainer}`}>
-            {serviceHighlights.map((item) => (
-              <article
-                key={item.title}
-                className="flex h-full flex-col rounded-xl border border-[#2a4540]/14 bg-white p-6 shadow-sm shadow-[#1a2e2a]/8 transition hover:-translate-y-0.5 hover:shadow-lg sm:p-7"
-              >
-                <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg bg-[#2a4540] text-white">
-                  {item.icon}
+                <div className="flex gap-0.5 mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <span key={i} className="text-lg">⭐</span>
+                  ))}
                 </div>
-                <h3 className="text-lg font-bold text-[#253632] sm:text-xl">
-                  {item.title}
-                </h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-[#665b53]">
-                  {item.description}
-                </p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section
-        className={`scroll-mt-28 bg-[#e8f2ef] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24 ${motionFadeUp}`}
-      >
-        <div className="mx-auto max-w-7xl">
-          <div className="mx-auto mb-12 max-w-3xl text-center lg:mb-14">
-            <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#356b5f] sm:text-xs">
-              Patient stories
-            </p>
-            <h2 className="mt-3 font-display text-3xl font-semibold leading-tight text-[#23342f] sm:text-4xl lg:text-[2.65rem]">
-              Care that feels calm and confident
-            </h2>
-          </div>
-
-          <div className={`grid gap-5 sm:gap-6 md:grid-cols-3 ${staggerContainer}`}>
-            {[
-              {
-                initials: "AN",
-                name: "Anita N.",
-                role: "Patient",
-                image:
-                  "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=900&q=80",
-                quote:
-                  "The triage flow helped me describe symptoms clearly before my visit. Booking felt straightforward.",
-              },
-              {
-                initials: "JM",
-                name: "John M.",
-                role: "Patient",
-                image:
-                  "https://images.unsplash.com/photo-1651008376811-b90baee60c1f?auto=format&fit=crop&w=900&q=80",
-                quote:
-                  "I could track my follow-up and medication continuity in one place. It removed a lot of the back-and-forth during treatment.",
-              },
-              {
-                initials: "EW",
-                name: "Dr. Wanjiku",
-                role: "Dermatologist",
-                image:
-                  "https://images.unsplash.com/photo-1612277795421-9bc7706a4a41?auto=format&fit=crop&w=900&q=80",
-                quote:
-                  "Patients arrive better prepared. The workflow supports faster intake and cleaner handoffs, while keeping the care human-first.",
-              },
-            ].map((t) => (
-              <article
-                key={t.name}
-                className="flex h-full flex-col rounded-xl border border-[#2a4540]/12 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-7"
-              >
-                <div className="flex items-center gap-3">
-                  <Image
-                    src={t.image}
-                    alt={`${t.name} testimonial portrait`}
-                    width={44}
-                    height={44}
-                    sizes="44px"
-                    className="h-11 w-11 rounded-md object-cover"
-                  />
-                  <div>
-                    <p className="font-bold text-[#2a4540]">{t.name}</p>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#5a6e6a]">
-                      {t.role}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-4 flex items-center gap-1 text-[#5a9b8a]">
-                  <StarIcon />
-                  <StarIcon />
-                  <StarIcon />
-                  <StarIcon />
-                  <StarIcon />
-                </div>
-
-                <p className="mt-4 text-sm leading-relaxed text-[#5f554d]">
-                  {t.quote}
-                </p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section
-        className={`scroll-mt-28 px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24 ${motionFadeUp}`}
-      >
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-14">
-          <div className="max-w-xl">
-            <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#356b5f] sm:text-xs">
-              How it works
-            </p>
-            <h2 className="mt-3 font-display text-3xl font-semibold leading-tight text-[#22332e] sm:text-4xl lg:text-[2.65rem]">
-              From concern to care—step by step
-            </h2>
-            <p className="mt-4 text-sm leading-relaxed text-[#62564e] sm:text-[15px]">
-              A clearer digital path: one profile, guided intake, then bookings
-              and follow-up without losing context.
-            </p>
-          </div>
-
-          <div className={`space-y-3 sm:space-y-4 ${staggerContainer}`}>
-            {processSteps.map((step, index) => (
-              <div
-                key={step.title}
-                className="flex gap-4 rounded-xl border border-[#2a4540]/12 bg-[#f8fcfb] p-4 shadow-sm sm:p-5"
-              >
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#2a4540] text-sm font-bold text-white">
-                  {index + 1}
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-[#2c3f3a]">
-                    {step.title}
-                  </h3>
-                  <p className="mt-1 text-sm text-[#665b53]">{step.text}</p>
-                </div>
+                <p className="text-muted-foreground group-hover:text-foreground transition-colors italic">"{testimonial.text}"</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section
-        id="faq"
-        className={`scroll-mt-28 bg-[#f4faf9] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24 ${motionFadeUp}`}
-      >
-        <div className="mx-auto max-w-7xl">
-          <div className="mx-auto mb-12 max-w-3xl text-center lg:mb-14">
-            <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#356b5f] sm:text-xs">
-              FAQ
-            </p>
-            <h2 className="mt-3 font-display text-3xl font-semibold leading-tight text-[#22332e] sm:text-4xl lg:text-[2.65rem]">
-              Quick answers before you book
+      {/* FAQ Section */}
+      <section id="faq" className={`py-20 sm:py-28 ${sectionShell} bg-secondary/30`}>
+        <div className="mx-auto w-full max-w-5xl">
+          <div className="text-center mb-14 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl xl:text-5xl font-bold text-foreground mb-4 animate-slide-up">
+              Frequently Asked Questions
             </h2>
+            <p className="text-lg sm:text-xl text-muted-foreground animate-slide-up" style={{ animationDelay: '0.1s' }}>
+              Everything you need to know about NSC
+            </p>
           </div>
 
-          <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
+          <div className="space-y-4">
             {[
               {
-                q: "Is the AI triage a replacement for a dermatologist?",
-                a: "No. The AI triage helps structure your intake and highlight patterns, but clinical care always remains human-reviewed and dermatologist-led.",
+                q: 'How does the AI skin analysis work?',
+                a: 'Our AI technology analyzes high-resolution images of your skin to identify concerns, determine skin type, and recommend personalized treatment options. Results are reviewed by our dermatologists before any treatment plan is created.',
               },
               {
-                q: "How fast can I get started?",
-                a: "Most patients can begin in minutes: create an account, upload images when needed, and proceed to bookings based on your care journey.",
+                q: 'What is the cost of a consultation?',
+                a: 'Initial consultations are KES 2,500. This includes a thorough skin assessment and personalized recommendations. AI analysis is included at no additional cost.',
               },
               {
-                q: "Can I track treatment and pharmacy follow-up?",
-                a: "Yes. Your dashboard keeps consultation history connected to follow-up steps, so medication continuity stays organized.",
+                q: 'Do you offer payment plans?',
+                a: 'Yes, we offer flexible payment plans for major treatments. Contact our office to discuss options that work for your budget.',
               },
               {
-                q: "Do I need special equipment to upload photos?",
-                a: "No. Use a normal phone camera in good lighting. Clear images help the triage generate better structured guidance.",
+                q: 'How long do results typically take to show?',
+                a: 'Results vary by treatment type. Some treatments show improvement within 2-4 weeks, while others may take 8-12 weeks. Your doctor will provide a detailed timeline during your consultation.',
               },
-            ].map((item) => (
+              {
+                q: 'Are your doctors qualified dermatologists?',
+                a: 'All our doctors are board-certified dermatologists with extensive experience in cosmetic and medical dermatology.',
+              },
+            ].map((faq, idx) => (
               <details
-                key={item.q}
-                className="group rounded-xl border border-[#2a4540]/14 bg-[#f8fcfb]/70 px-5 py-4 sm:px-6 sm:py-5 [&_summary::-webkit-details-marker]:hidden"
+                key={idx}
+                className="border border-border bg-card group rounded-lg overflow-hidden hover:border-primary/30 transition-colors animate-slide-up"
+                style={{animationDelay: `${0.05 * idx}s`}}
               >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
-                  <span className="text-sm font-semibold text-[#2a4540]">
-                    {item.q}
-                  </span>
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-[#5a9b8a]/25 text-[#2a4540] transition-transform duration-200 group-open:rotate-45">
-                    +
-                  </span>
+                <summary className="p-6 cursor-pointer font-semibold text-foreground flex items-center justify-between hover:bg-secondary/50 transition-colors">
+                  <span className="group-open:text-primary transition-colors">{faq.q}</span>
+                  <ChevronDown size={20} className="group-open:rotate-180 group-open:text-primary transition-all" />
                 </summary>
-                <p className="mt-3 text-sm leading-relaxed text-[#5f554d]">
-                  {item.a}
-                </p>
+                <div className="px-6 pb-6 text-muted-foreground border-t border-border bg-secondary/20">{faq.a}</div>
               </details>
             ))}
           </div>
         </div>
       </section>
 
+      {/* Contact Section */}
       <section
-        className={`px-4 py-14 sm:px-6 sm:py-16 lg:px-8 ${motionFadeUp}`}
+        id="contact"
+        className={`py-20 sm:py-28 ${sectionShell} bg-background overflow-hidden relative`}
       >
-        <div className="mx-auto grid max-w-7xl gap-8 rounded-sm border border-[#2a4540]/25 bg-gradient-to-br from-[#1a2e2a] via-[#243d38] to-[#2a4540] p-7 text-white shadow-lg shadow-[#0f1c1a]/35 sm:p-9 lg:grid-cols-[1fr_auto] lg:items-center">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#d9b8a8]">
-              Visit The Clinic
-            </p>
-            <h2 className="mt-2 font-display text-2xl font-semibold leading-tight sm:text-3xl lg:text-4xl">
-              Fortis Suites, Hospital Road, Nairobi
-            </h2>
-            <p className="mt-3 max-w-2xl text-sm text-[#ecdfd4]">
-              Rm409, 4th Floor, Off Ngong Road, Opp Nairobi Club. Book digitally
-              and continue treatment with in-person specialist care.
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <a
-              href="tel:+254721497444"
-              className="inline-flex justify-center rounded-sm bg-white px-6 py-3 text-center text-sm font-bold uppercase tracking-[0.1em] text-[#2a4540] transition hover:bg-[#f0f7f5]"
-            >
-              0721-497-444
-            </a>
-            <a
-              href="mailto:drwanyika14@gmail.com"
-              className="inline-flex justify-center rounded-sm border border-white/45 px-6 py-3 text-center text-sm font-bold uppercase tracking-[0.1em] text-white transition hover:bg-white/10"
-            >
-              Email clinic
-            </a>
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary rounded-full blur-3xl animate-pulse-soft" />
+        </div>
+
+        <div className={`${contentMax} relative z-10`}>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+            <div className="lg:col-span-5 animate-slide-left">
+              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-xl border border-border mb-10 lg:mb-0 lg:sticky lg:top-28">
+                <Image
+                  src={IMG.heroClinic}
+                  alt="Nairobi Skin Centre clinic interior"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 42vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/50 to-transparent pointer-events-none" />
+                <p className="absolute bottom-4 left-4 right-4 text-white text-sm font-medium">
+                  Visit us in Hurlingham — consultations by appointment
+                </p>
+              </div>
+            </div>
+            <div className="lg:col-span-3 animate-slide-left" style={{ animationDelay: '0.05s' }}>
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-8">Get In Touch</h2>
+              <div className="space-y-6">
+                <div className="group">
+                  <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">Phone</h3>
+                  <p className="text-muted-foreground">+254 (0)20 2720 100</p>
+                </div>
+                <div className="group">
+                  <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">Email</h3>
+                  <p className="text-muted-foreground">info@nairobiskincentre.co.ke</p>
+                </div>
+                <div className="group">
+                  <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">Location</h3>
+                  <p className="text-muted-foreground">Hurlingham, Nairobi, Kenya</p>
+                </div>
+                <div className="group">
+                  <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">Hours</h3>
+                  <p className="text-muted-foreground">Mon-Fri: 8:00 AM - 6:00 PM</p>
+                  <p className="text-muted-foreground">Sat: 9:00 AM - 4:00 PM</p>
+                  <p className="text-muted-foreground">Sun: Closed</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-4 bg-gradient-to-br from-secondary/50 to-card border border-border p-8 sm:p-10 rounded-2xl hover:shadow-lg transition-shadow animate-slide-right">
+              <h3 className="text-xl font-semibold text-foreground mb-6">Send us a Message</h3>
+              <form className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Your Name"
+                  className="w-full px-4 py-3 border border-border bg-card text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-lg transition-all"
+                />
+                <input
+                  type="email"
+                  placeholder="Your Email"
+                  className="w-full px-4 py-3 border border-border bg-card text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-lg transition-all"
+                />
+                <textarea
+                  placeholder="Your Message"
+                  rows={4}
+                  className="w-full px-4 py-3 border border-border bg-card text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-lg transition-all"
+                />
+                <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
+                  Send Message
+                </Button>
+              </form>
+            </div>
           </div>
         </div>
       </section>
 
-      {!isLoggedIn && (
-        <section
-          className={`px-4 pb-16 pt-2 sm:px-6 lg:px-8 ${motionFadeUp}`}
-        >
-          <div className="mx-auto max-w-3xl rounded-sm border border-[#2a4540]/14 bg-gradient-to-b from-[#f4faf9] to-[#e4f0ed] px-6 py-10 text-center shadow-sm sm:px-10 sm:py-12">
-            <h2 className="font-display text-3xl font-semibold text-[#263a35] sm:text-4xl">
-              Start with one sign-up
-            </h2>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-[#675b53]">
-              Create your profile, verify your phone by SMS, then use triage,
-              bookings, and follow-up in one place.
-            </p>
-            <Link
-              href="/signup"
-              className="mt-8 inline-flex rounded-sm bg-[#2a4540] px-9 py-3.5 text-sm font-bold uppercase tracking-[0.12em] text-white shadow-md shadow-[#1a2e2a]/25 transition hover:bg-[#1f3330]"
-            >
-              Create account
-            </Link>
+      {/* Footer */}
+      <footer className={`bg-gradient-to-r from-foreground to-foreground/95 text-white py-14 sm:py-16 ${sectionShell}`}>
+        <div className={contentMax}>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-5 h-5 bg-primary/80 rounded"></div>
+                <h3 className="font-bold text-lg">Nairobi Skin Centre</h3>
+              </div>
+              <p className="text-white/70 text-sm">
+                Expert dermatology services with AI-powered insights for beautiful, healthy skin.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4 text-white">Services</h4>
+              <ul className="space-y-2 text-sm text-white/70">
+                <li><a href="#services" className="hover:text-white hover:translate-x-1 transition-all inline-block">→ Acne Treatment</a></li>
+                <li><a href="#services" className="hover:text-white hover:translate-x-1 transition-all inline-block">→ Laser Treatments</a></li>
+                <li><a href="#services" className="hover:text-white hover:translate-x-1 transition-all inline-block">→ Hair Loss Solutions</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4 text-white">Company</h4>
+              <ul className="space-y-2 text-sm text-white/70">
+                <li><a href="#" className="hover:text-white hover:translate-x-1 transition-all inline-block">→ About Us</a></li>
+                <li><a href="#" className="hover:text-white hover:translate-x-1 transition-all inline-block">→ Blog</a></li>
+                <li><a href="#" className="hover:text-white hover:translate-x-1 transition-all inline-block">→ Careers</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4 text-white">Legal</h4>
+              <ul className="space-y-2 text-sm text-white/70">
+                <li><a href="#" className="hover:text-white hover:translate-x-1 transition-all inline-block">→ Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-white hover:translate-x-1 transition-all inline-block">→ Terms of Service</a></li>
+              </ul>
+            </div>
           </div>
-        </section>
-      )}
+          <div className="border-t border-white/20 pt-8 text-center text-white/60 text-sm">
+            <p>&copy; 2024 Nairobi Skin Centre. All rights reserved. | Caring for Your Skin Health</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
